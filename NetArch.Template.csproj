@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageType>Template</PackageType>
+    <PackageVersion>1.0.0</PackageVersion>
+    <PackageId>NetArch.Template</PackageId>
+    <Title>NetArch Architecture Template</Title>
+    <Authors>Si Thu Kyaw</Authors>
+    <Description>NetArch Architecture Template for highly customizable ASP.NET Core scaffolds.</Description>
+    <PackageTags>dotnet-new;templates;clean-architecture;ntier</PackageTags>
+    
+    <TargetFramework>net10.0</TargetFramework>
+    
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    
+    <!-- Suppress warnings related to no lib or ref folders (standard for templates) -->
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="**\*" Exclude="**\bin\**;**\obj\**;**\.git\**;**\.vs\**;**\.idea\**;**\.vscode\**;**\node_modules\**;**\.angular\**;**\dist\**;**\TestResults\**;NetArch.Template.csproj;*.user;*.suo" />
+    <Compile Remove="**\*" />
+  </ItemGroup>
+
+</Project>

@@ -4,17 +4,32 @@ Welcome to the **NetArch Architecture Template**! This template allows you to ra
 
 ## Installation
 
-To install the template on your local machine, open your terminal, navigate to the root directory of this repository, and run the following command:
+There are two primary ways to install the NetArch Architecture Template on your machine.
+
+### Option 1: Install via NuGet Package (Recommended)
+
+You can download the latest pre-compiled `.nupkg` file directly from the [GitHub Releases](https://github.com/mrstk123/NetArch/releases) page of this repository.
+
+Once downloaded, run the following command from the directory where the `.nupkg` is saved:
 
 ```bash
+dotnet new install ./NetArch.Template.<version>.nupkg
+```
+
+### Option 2: Install from Source (Git Clone)
+
+Alternatively, you can clone the repository to your local machine and install the template directly from the source code directory:
+
+```bash
+# Clone the repository
+git clone https://github.com/mrstk123/NetArch.git
+cd NetArch
+
+# Install the template
 dotnet new install .
 ```
 
-To update or reinstall an existing version of this template, simply append the `--force` flag:
-
-```bash
-dotnet new install . --force
-```
+> **Note:** To update or reinstall an existing version of this template from source, simply append the `--force` flag: `dotnet new install . --force`
 
 ---
 
@@ -41,7 +56,7 @@ Defines the core software pattern of the project.
 * **`Clean`** *(Default)*: Generates Domain, Application, Infrastructure, and WebAPI layers. Highly decoupled architecture.
 * **`NTier`**: Generates BusinessLogic, Infrastructure, and WebAPI layers. A more straightforward, traditional approach.
 
-> Example: `dotnet new net-arch --architecture ntier`
+> Example: `dotnet new net-arch --architecture clean`
 
 #### 2. Object-Relational Mapper / DB Strategy (`--orm` or `-o`)
 Defines how your application connects and maps data to the database.
@@ -49,7 +64,7 @@ Defines how your application connects and maps data to the database.
 * **`Dapper`**: Scaffolds lightweight Dapper micro-ORM querying logic.
 * **`Hybrid`**: Combines both approaches—using EF Core for complex writes and Dapper for high-performance reads.
 
-> Example: `dotnet new net-arch --orm hybrid`
+> Example: `dotnet new net-arch --orm efcore`
 
 #### 3. User Interface (`-ui` or `-u`)
 Defines the front-end implementation of your project.
@@ -62,16 +77,34 @@ Defines the front-end implementation of your project.
 
 ## Full Example
 
-If you want to create an N-Tier application, utilizing Dapper for all database interactions, paired with an Angular front-end, you would run:
+If you want to create a Clean Architecture application, utilizing EF Core for all database interactions, paired with an Angular front-end, you would run:
 
 ```bash
-dotnet new net-arch -n MyStoreApp -o ./MyStoreApp --architecture ntier --orm dapper --ui angular
+dotnet new net-arch -n MyApp -o ./MyApp --architecture clean --orm efcore --ui angular
 ```
 
 ## Uninstalling the Template
 
-If you ever wish to remove the template from your local dotnet tools, run:
+If you installed from source (Option 2), run:
 
 ```bash
 dotnet new uninstall .
 ```
+
+If you installed via NuGet package (Option 1), run:
+
+```bash
+dotnet new uninstall NetArch.Template
+```
+
+---
+
+## Contributing & Packaging
+
+If you are modifying the template source code and wish to build a new `.nupkg` release artifact yourself, you can run the following command from the root directory:
+
+```bash
+dotnet pack NetArch.Template.csproj -c Release
+```
+
+This generates a fresh `NetArch.Template.<version>.nupkg` file in the `bin/Release` folder, which can then be published to GitHub Releases or NuGet feeds.
