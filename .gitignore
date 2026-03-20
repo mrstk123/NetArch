@@ -1,0 +1,51 @@
+# ==================================
+# ASP.NET Core / .NET Core Overrides
+# ==================================
+[Bb]in/
+[Oo]bj/
+
+# Test results
+[Tt]est[Rr]esults/
+
+# IDE & Editor exclusions
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ==================================
+# Angular / Node.js Overrides
+# ==================================
+# Node modules
+**/node_modules/
+
+# IDE / Editor configuration
+**/.angular/
+**/.vscode/
+
+# Build artifacts
+**/dist/
+**/tmp/
+**/out-tsc/
+**/bazel-out/
+
+# E2E test artifacts
+**/cypress/videos/
+**/cypress/screenshots/
+
+# Log files
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
+# ==================================
+# OS / Other 
+# ==================================
+.DS_Store
+Thumbs.db

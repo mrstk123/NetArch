@@ -1,0 +1,130 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Si Thu Kyaw",
+    "classifications": [
+        "Web",
+        "API",
+        "Architecture"
+    ],
+    "name": "NetArch Architecture Template",
+    "identity": "NetArch.Template.CSharp",
+    "shortName": "net-arch",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "sourceName": "NetArch.Template",
+    "preferNameDirectory": true,
+    "symbols": {
+        "architecture": {
+            "type": "parameter",
+            "shortName": "a",
+            "dataType": "choice",
+            "defaultValue": "Clean",
+            "choices": [
+                {
+                    "choice": "Clean",
+                    "description": "Domain, Application, and Infrastructure layers"
+                },
+                {
+                    "choice": "NTier",
+                    "description": "BusinessLogic and DataAccess layers"
+                }
+            ]
+        },
+        "ui": {
+            "type": "parameter",
+            "shortName": "u",
+            "dataType": "choice",
+            "defaultValue": "None",
+            "choices": [
+                {
+                    "choice": "None",
+                    "description": "Back-end API only"
+                },
+                {
+                    "choice": "Angular",
+                    "description": "ASP.NET Core with Angular SPA"
+                }
+            ]
+        },
+        "orm": {
+            "type": "parameter",
+            "shortName": "o",
+            "dataType": "choice",
+            "defaultValue": "EFCore",
+            "choices": [
+                {
+                    "choice": "EFCore",
+                    "description": "Entity Framework Core"
+                },
+                {
+                    "choice": "Dapper",
+                    "description": "Dapper Micro-ORM"
+                },
+                {
+                    "choice": "Hybrid",
+                    "description": "EF Core for Writes, Dapper for Reads"
+                }
+            ]
+        },
+        "IsClean": {
+            "type": "computed",
+            "value": "(architecture == \"Clean\" || architecture == \"clean\")"
+        },
+        "IsNTier": {
+            "type": "computed",
+            "value": "(architecture == \"NTier\" || architecture == \"ntier\")"
+        },
+        "IsEFCore": {
+            "type": "computed",
+            "value": "(orm == \"EFCore\" || orm == \"efcore\")"
+        },
+        "IsDapper": {
+            "type": "computed",
+            "value": "(orm == \"Dapper\" || orm == \"dapper\")"
+        },
+        "IsHybrid": {
+            "type": "computed",
+            "value": "(orm == \"Hybrid\" || orm == \"hybrid\")"
+        },
+
+        "IsAngular": {
+            "type": "computed",
+            "value": "(ui == \"Angular\" || ui == \"angular\")"
+        },
+        "StripSourceCompilation": {
+            "type": "generated",
+            "generator": "constant",
+            "parameters": {
+                "value": " Condition=\"false\""
+            },
+            "replaces": " Condition=\"'$(IsTemplateGenerated)' == ''\""
+        }
+    },
+    "sources": [
+        {
+            "modifiers": [
+                {
+                    "condition": "(ui != 'Angular' && ui != 'angular')",
+                    "exclude": [
+                        "NetArch.Template.ClientApp/**"
+                    ]
+                },
+                {
+                    "condition": "(architecture == 'NTier' || architecture == 'ntier')",
+                    "exclude": [
+                        "NetArch.Template.Domain/**",
+                        "NetArch.Template.Application/**"
+                    ]
+                },
+                {
+                    "condition": "(architecture == 'Clean' || architecture == 'clean')",
+                    "exclude": [
+                        "NetArch.Template.BusinessLogic/**"
+                    ]
+                }
+            ]
+        }
+    ]
+}

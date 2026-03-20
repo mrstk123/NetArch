@@ -1,0 +1,77 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!--#if (ui == "Angular")-->
+    <SpaRoot>..\NetArch.Template.ClientApp\</SpaRoot>
+    <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
+    <SpaProxyServerUrl>http://localhost:4200</SpaProxyServerUrl>
+    <!--#endif-->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
+  </ItemGroup>
+
+<!--#if (IsClean)-->
+  <ItemGroup>
+    <ProjectReference Include="..\NetArch.Template.Application\NetArch.Template.Application.csproj" />
+  </ItemGroup>
+<!--#endif-->
+<!--#if (IsNTier)-->
+  <ItemGroup>
+    <ProjectReference Include="..\NetArch.Template.BusinessLogic\NetArch.Template.BusinessLogic.csproj" />
+  </ItemGroup>
+<!--#endif-->
+  <ItemGroup>
+    <ProjectReference Include="..\NetArch.Template.Infrastructure\NetArch.Template.Infrastructure.csproj" />
+  </ItemGroup>
+    
+<!--#if (ui == "Angular")-->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Don't build or publish node_modules -->
+    <Content Remove="$(SpaRoot)**" />
+    <None Remove="$(SpaRoot)**" />
+    <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+  </ItemGroup>
+
+  <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
+    <Exec Command="node --version" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+    </Exec>
+    <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project." />
+    <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+  </Target>
+
+  <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build -- --configuration production" />
+    <ItemGroup>
+      <DistFiles Include="$(SpaRoot)dist\**" />
+      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>wwwroot\%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
+<!--#endif-->
+
+  <!-- Template source compilation overrides -->
+  <PropertyGroup Condition="'$(IsTemplateGenerated)' == ''">
+    <DefineConstants>$(DefineConstants);IsClean</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(IsTemplateGenerated)' == ''">
+    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="10.0.0" />
+  </ItemGroup>
+
+
+
+</Project>

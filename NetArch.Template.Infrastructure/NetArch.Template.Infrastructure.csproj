@@ -1,0 +1,78 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+<!--#if (IsClean)-->
+  <ItemGroup>
+    <ProjectReference Include="..\NetArch.Template.Domain\NetArch.Template.Domain.csproj" />
+    <ProjectReference Include="..\NetArch.Template.Application\NetArch.Template.Application.csproj" />
+  </ItemGroup>
+<!--#endif-->
+<!--#if (IsNTier)-->
+  <ItemGroup>
+    <ProjectReference Include="..\NetArch.Template.BusinessLogic\NetArch.Template.BusinessLogic.csproj" />
+  </ItemGroup>
+<!--#endif-->
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.5" />
+  </ItemGroup>
+
+  <!--
+    Source project compilation: these are included ONLY when building the template source project
+    itself, so that the IDE compiler has types to resolve and #if blocks to evaluate.
+    When the template is generated, template.json will exclude these elements.
+  -->
+  <PropertyGroup Condition="'$(IsTemplateGenerated)' == ''">
+    <DefineConstants>$(DefineConstants);IsEFCore;IsClean</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(IsTemplateGenerated)' == ''">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
+  </ItemGroup>
+
+<!--#if (IsEFCore || IsHybrid)-->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+<!--#endif-->
+
+<!--#if (IsDapper || IsHybrid)-->
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
+  </ItemGroup>
+<!--#endif-->
+
+<!--#if (IsEFCore || IsHybrid)-->
+  <ItemGroup>
+    <Folder Include="Persistence/Configurations/" />
+    <Folder Include="Persistence/Context/" />
+    <Folder Include="Persistence/Interceptors/" />
+    <Folder Include="Persistence/Repositories/" />
+  </ItemGroup>
+<!--#endif-->
+
+<!--#if (IsDapper)-->
+  <ItemGroup>
+    <Folder Include="Persistence/Repositories/" />
+  </ItemGroup>
+<!--#endif-->
+
+</Project>
