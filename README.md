@@ -51,14 +51,14 @@ You can heavily customize the generated project architecture by passing paramete
 
 Here are all the available options you can mix and match:
 
-#### 1. Architecture (`--architecture` or `-a`)
+#### 1. Architecture (`--architecture` or `-ar`)
 Defines the core software pattern of the project.
 * **`Clean`** *(Default)*: Generates Domain, Application, Infrastructure, and WebAPI layers. Highly decoupled architecture.
 * **`NTier`**: Generates BusinessLogic, Infrastructure, and WebAPI layers. A more straightforward, traditional approach.
 
 > Example: `dotnet new net-arch --architecture clean`
 
-#### 2. Object-Relational Mapper / DB Strategy (`--orm` or `-o`)
+#### 2. Object-Relational Mapper / DB Strategy (`--orm` or `-or`)
 Defines how your application connects and maps data to the database.
 * **`EFCore`** *(Default)*: Scaffolds Entity Framework Core contexts, configurations, and repositories.
 * **`Dapper`**: Scaffolds lightweight Dapper micro-ORM querying logic.
@@ -66,7 +66,7 @@ Defines how your application connects and maps data to the database.
 
 > Example: `dotnet new net-arch --orm efcore`
 
-#### 3. User Interface (`-ui` or `-u`)
+#### 3. User Interface (`-ui`)
 Defines the front-end implementation of your project.
 * **`None`** *(Default)*: Scaffolds a Back-end API only.
 * **`Angular`**: Scaffolds an ASP.NET Core backend bundled with a full Angular Single Page Application (SPA).
