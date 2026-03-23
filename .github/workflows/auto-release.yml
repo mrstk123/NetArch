@@ -1,0 +1,29 @@
+name: Auto Release on Master Push
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate unique tag
+        id: tag_generator
+        run: echo "TAG_NAME=v$(date +'%Y.%m.%d').${{ github.run_number }}" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          name: Release ${{ env.TAG_NAME }}
+          body: "Automated release generated from a push to the master branch."
+          draft: false
+          prerelease: false
