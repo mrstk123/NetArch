@@ -1,4 +1,4 @@
-name: Auto Release on Master Push
+name: Auto Release NuGet on Master Push
 
 on:
   push:
@@ -15,15 +15,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Generate unique tag
-        id: tag_generator
-        run: echo "TAG_NAME=v$(date +'%Y.%m.%d').${{ github.run_number }}" >> $GITHUB_ENV
+      # 1. Set up the .NET SDK (Change the version if you are targeting .NET 6 or 7)
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x' 
 
-      - name: Create GitHub Release
+      # 2. Generate both a Tag Name and a strict NuGet Version
+      - name: Generate Version Numbers
+        id: version_generator
+        run: |
+          DATE_VERSION="$(date +'%Y.%m.%d').${{ github.run_number }}"
+          echo "NUGET_VERSION=$DATE_VERSION" >> $GITHUB_ENV
+          echo "TAG_NAME=v$DATE_VERSION" >> $GITHUB_ENV
+
+      # 3. Build and Pack the .NET project into a .nupkg file
+      # /p:Version overrides the version inside your .csproj file with our new date version
+      - name: Pack NuGet Package
+        run: dotnet pack --configuration Release /p:Version=${{ env.NUGET_VERSION }} --output ./nupkg-artifacts
+
+      # 4. Create the Release AND upload the generated .nupkg file to it
+      - name: Create GitHub Release & Upload Asset
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG_NAME }}
           name: Release ${{ env.TAG_NAME }}
-          body: "Automated release generated from a push to the master branch."
+          body: "Automated NuGet package release generated from the master branch."
           draft: false
           prerelease: false
+          files: ./nupkg-artifacts/*.nupkg
