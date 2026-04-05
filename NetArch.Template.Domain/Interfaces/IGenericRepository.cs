@@ -1,3 +1,4 @@
+#if (IsEFCore)
 using System.Linq.Expressions;
 
 namespace NetArch.Template.Domain.Interfaces;
@@ -14,3 +15,4 @@ public interface IGenericRepository<T> where T : class
     void Update(T entity);
     void Delete(T entity);
 }
+#endif

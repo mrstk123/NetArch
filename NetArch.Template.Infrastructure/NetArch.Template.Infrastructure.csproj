@@ -23,15 +23,17 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.5" />
   </ItemGroup>
 
+<!--#if (IsSourceCompile)-->
   <!--
     Source project compilation: these are included ONLY when building the template source project
     itself, so that the IDE compiler has types to resolve and #if blocks to evaluate.
     When the template is generated, template.json will exclude these elements.
   -->
-  <PropertyGroup Condition="'$(IsTemplateGenerated)' == ''">
+  <PropertyGroup>
     <DefineConstants>$(DefineConstants);IsEFCore;IsClean</DefineConstants>
+    <NoWarn>$(NoWarn);NU1504</NoWarn>
   </PropertyGroup>
-  <ItemGroup Condition="'$(IsTemplateGenerated)' == ''">
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
@@ -41,6 +43,7 @@
     <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
   </ItemGroup>
+<!--#endif-->
 
 <!--#if (IsEFCore || IsHybrid)-->
   <ItemGroup>
@@ -64,14 +67,21 @@
   <ItemGroup>
     <Folder Include="Persistence/Configurations/" />
     <Folder Include="Persistence/Context/" />
+  </ItemGroup>
+<!--#endif-->
+
+<!--#if (IsEFCore)-->
+  <ItemGroup>
     <Folder Include="Persistence/Interceptors/" />
     <Folder Include="Persistence/Repositories/" />
   </ItemGroup>
 <!--#endif-->
 
-<!--#if (IsDapper)-->
+<!--#if (IsDapper || IsHybrid)-->
   <ItemGroup>
-    <Folder Include="Persistence/Repositories/" />
+    <Folder Include="Commands/" />
+    <Folder Include="Queries/" />
+    <Folder Include="Persistence/Scripts/" />
   </ItemGroup>
 <!--#endif-->
 

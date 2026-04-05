@@ -14,12 +14,12 @@ using NetArch.Template.Domain.Interfaces;
 using NetArch.Template.BusinessLogic.Interfaces;
 #endif
 
-using NetArch.Template.Infrastructure.Persistence.Repositories;
 #if (IsEFCore || IsHybrid)
 using NetArch.Template.Infrastructure.Persistence.Context;
-#if (IsClean)
-using NetArch.Template.Infrastructure.Persistence.Interceptors;
 #endif
+#if (IsEFCore)
+using NetArch.Template.Infrastructure.Persistence.Interceptors;
+using NetArch.Template.Infrastructure.Persistence.Repositories;
 #endif
 
 namespace NetArch.Template.Infrastructure;
@@ -31,7 +31,7 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
 #if (IsEFCore || IsHybrid)
-#if (IsClean)
+#if (IsClean && IsEFCore)
         services.AddScoped<AuditableEntityInterceptor>();
 #endif
 
@@ -41,7 +41,7 @@ public static class DependencyInjection
                 configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName));
 
-#if (IsClean)
+#if (IsClean && IsEFCore)
             var interceptor = sp.GetRequiredService<AuditableEntityInterceptor>();
             options.AddInterceptors(interceptor);
 #endif
@@ -53,8 +53,10 @@ public static class DependencyInjection
             new SqlConnection(configuration.GetConnectionString("DefaultConnection")));
 #endif
 
+#if (IsEFCore)
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+#endif
 
         return services;
     }

@@ -85,22 +85,26 @@
             "type": "computed",
             "value": "(orm == \"Hybrid\" || orm == \"hybrid\")"
         },
-
         "IsAngular": {
             "type": "computed",
             "value": "(ui == \"Angular\" || ui == \"angular\")"
         },
-        "StripSourceCompilation": {
-            "type": "generated",
-            "generator": "constant",
-            "parameters": {
-                "value": " Condition=\"false\""
-            },
-            "replaces": " Condition=\"'$(IsTemplateGenerated)' == ''\""
+        "IsSourceCompile": {
+            "type": "computed",
+            "value": "false"
         }
     },
     "sources": [
         {
+            "exclude": [
+                ".git/**",
+                "**/.idea/**",
+                ".vscode/*",
+                ".template.config/**",
+                ".gitignore",
+                "README.md",
+                "NetArch.Template.csproj"
+            ],
             "modifiers": [
                 {
                     "condition": "(ui != 'Angular' && ui != 'angular')",
@@ -119,6 +123,34 @@
                     "condition": "(architecture == 'Clean' || architecture == 'clean')",
                     "exclude": [
                         "NetArch.Template.BusinessLogic/**"
+                    ]
+                },
+                {
+                    "condition": "(orm == 'Dapper' || orm == 'dapper')",
+                    "exclude": [
+                        "NetArch.Template.Infrastructure/Persistence/Configurations/**",
+                        "NetArch.Template.Infrastructure/Persistence/Context/**"
+                    ]
+                },
+                {
+                    "condition": "(orm != 'EFCore' && orm != 'efcore')",
+                    "exclude": [
+                        "NetArch.Template.Domain/Interfaces/IGenericRepository.cs",
+                        "NetArch.Template.Domain/Interfaces/IUnitOfWork.cs",
+                        "NetArch.Template.BusinessLogic/Interfaces/IGenericRepository.cs",
+                        "NetArch.Template.BusinessLogic/Interfaces/IUnitOfWork.cs",
+                        "NetArch.Template.Infrastructure/Persistence/Interceptors/**",
+                        "NetArch.Template.Infrastructure/Persistence/Repositories/**"
+                    ]
+                },
+                {
+                    "condition": "(orm == 'EFCore' || orm == 'efcore')",
+                    "exclude": [
+                        "NetArch.Template.Application/Interfaces/Commands/**",
+                        "NetArch.Template.Application/Interfaces/Queries/**",
+                        "NetArch.Template.Infrastructure/Commands/**",
+                        "NetArch.Template.Infrastructure/Queries/**",
+                        "NetArch.Template.Infrastructure/Persistence/Scripts/**"
                     ]
                 }
             ]

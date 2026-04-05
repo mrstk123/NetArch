@@ -11,8 +11,11 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
   </ItemGroup>
 
+  <!--#if (IsDapper || IsHybrid)-->
   <ItemGroup>
-    <Folder Include="DTOs/" />
+    <Folder Include="Interfaces/Commands/" />
+    <Folder Include="Interfaces/Queries/" />
   </ItemGroup>
+<!--#endif-->
 
 </Project>

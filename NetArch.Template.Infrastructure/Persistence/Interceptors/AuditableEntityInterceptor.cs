@@ -1,4 +1,4 @@
-#if (IsEFCore || IsHybrid)
+#if (IsEFCore)
 #if (IsClean)
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
