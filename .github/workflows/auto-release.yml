@@ -3,7 +3,7 @@ name: Auto Release NuGet on Master Push
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build-and-release:
