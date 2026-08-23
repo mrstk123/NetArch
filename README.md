@@ -1,6 +1,11 @@
 # NetArch Architecture Template
 
+![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=flat&logo=dotnet)![Angular](https://img.shields.io/badge/Angular-22-DD0031?style=flat&logo=angular)![Entity Framework Core](https://img.shields.io/badge/EF%20Core-10.0-512BD4?style=flat)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
 Welcome to the **NetArch Architecture Template**! This template allows you to rapidly scaffold a new ASP.NET Core project tailored specifically to your architectural, database, and UI preferences.
+
+> **Prerequisites:** .NET SDK 10.0 · SQL Server 2022 or LocalDB (EF Core / Hybrid samples) · Node.js ≥ 22.22.3 (only for `--ui angular`)
 
 ## Installation
 

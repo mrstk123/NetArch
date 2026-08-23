@@ -85,9 +85,9 @@ jobs:
 
       # Pack ONLY the template csproj — a bare `dotnet pack` would resolve to the
       # solution and publish every layer project as an unwanted NuGet package.
-      # /p:Version overrides the version inside your .csproj file with our new date version
+      # /p:PackageVersion overrides the version inside your .csproj file with our new date version
       - name: Pack NuGet Package
-        run: dotnet pack NetArch.Template.csproj --configuration Release /p:Version=${{ env.NUGET_VERSION }} --output ./nupkg-artifacts
+        run: dotnet pack NetArch.Template.csproj --configuration Release /p:PackageVersion=${{ env.NUGET_VERSION }} --output ./nupkg-artifacts
 
       # Create the Release AND upload the generated .nupkg file to it
       - name: Create GitHub Release & Upload Asset
