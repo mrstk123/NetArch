@@ -1,4 +1,4 @@
-name: Validate Template and Release NuGet on Main Push
+name: Validate Template and Publish Release
 
 on:
   push:
@@ -7,11 +7,17 @@ on:
     paths-ignore:
       - '**.md'
 
+# Serialize pushes to main so two merges can never race to publish the same version.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   # Generate and build every architecture x ORM variant so conditional
   # template code paths are actually compiled before a release ships.
   validate-matrix:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -40,6 +46,7 @@ jobs:
 
   validate-angular:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -60,9 +67,58 @@ jobs:
       - name: Build scaffolded solution
         run: dotnet build "$RUNNER_TEMP/angular/AngularApp.sln" -c Release
 
-  release:
-    needs: [validate-matrix, validate-angular]
+  # The version in NetArch.Template.csproj IS the release version.
+  # If that version was already published, this job hard-fails so the
+  # developer must bump <PackageVersion> — published versions are immutable.
+  check-release:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Read version from template project
+        id: version
+        run: |
+          VERSION="$(dotnet msbuild NetArch.Template.csproj -getProperty:PackageVersion --nologo | tr -d '[:space:]')"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::<PackageVersion> '$VERSION' is not valid SemVer (expected MAJOR.MINOR.PATCH)."
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Template version: $VERSION"
+
+      # Published versions are immutable — same version can never be released twice.
+      - name: Guard against already-published versions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          TAG="v${VERSION}"
+
+          if gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            echo "::error::Version ${VERSION} is already published (release '${TAG}' exists). Update <PackageVersion> in NetArch.Template.csproj to release new changes."
+            exit 1
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "::error::Tag '${TAG}' exists without a matching release (previous publish failed?). Delete the stale tag or bump <PackageVersion>."
+            exit 1
+          fi
+
+  release:
+    needs: [validate-matrix, validate-angular, check-release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: write
 
@@ -75,27 +131,27 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      # Generate both a Tag Name and a strict NuGet Version
-      - name: Generate Version Numbers
-        id: version_generator
-        run: |
-          DATE_VERSION="$(date +'%Y.%m.%d').${{ github.run_number }}"
-          echo "NUGET_VERSION=$DATE_VERSION" >> $GITHUB_ENV
-          echo "TAG_NAME=v$DATE_VERSION" >> $GITHUB_ENV
-
       # Pack ONLY the template csproj — a bare `dotnet pack` would resolve to the
       # solution and publish every layer project as an unwanted NuGet package.
-      # /p:PackageVersion overrides the version inside your .csproj file with our new date version
+      # The tag v<version> is created automatically by the release action below.
       - name: Pack NuGet Package
-        run: dotnet pack NetArch.Template.csproj --configuration Release /p:PackageVersion=${{ env.NUGET_VERSION }} --output ./nupkg-artifacts
+        run: dotnet pack NetArch.Template.csproj --configuration Release /p:PackageVersion=${{ needs.check-release.outputs.version }} --output ./nupkg-artifacts
 
-      # Create the Release AND upload the generated .nupkg file to it
+      - name: Verify packed version matches csproj
+        run: |
+          EXPECTED="NetArch.Template.${{ needs.check-release.outputs.version }}.nupkg"
+          ls -l ./nupkg-artifacts
+          if [ ! -f "./nupkg-artifacts/${EXPECTED}" ]; then
+            echo "::error::Expected artifact ${EXPECTED} was not produced."
+            exit 1
+          fi
+
       - name: Create GitHub Release & Upload Asset
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.TAG_NAME }}
-          name: Release ${{ env.TAG_NAME }}
-          body: "Automated NuGet package release generated from the main branch."
+          tag_name: v${{ needs.check-release.outputs.version }}
+          name: Release v${{ needs.check-release.outputs.version }}
+          body: "NetArch Template v${{ needs.check-release.outputs.version }} — see commit history for changes."
           draft: false
           prerelease: false
           files: ./nupkg-artifacts/*.nupkg

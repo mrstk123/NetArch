@@ -157,3 +157,17 @@ dotnet pack NetArch.Template.csproj -c Release
 ```
 
 This generates a fresh `NetArch.Template.<version>.nupkg` file in the `bin/Release` folder, which can then be published to GitHub Releases or NuGet feeds.
+
+### Releasing (maintainers)
+
+Releases are **automatic** — the version in `NetArch.Template.csproj` drives everything:
+
+1. Bump `<PackageVersion>` (e.g. `1.1.0` → `1.1.1`)
+2. Commit and push to `main`
+
+CI validates every architecture/ORM variant, then publishes a GitHub Release `v<version>` with `NetArch.Template.<version>.nupkg` attached.
+
+Rules enforced by CI:
+- A version can be published **once** — pushing code whose `<PackageVersion>` was already released hard-fails with *"Update \<PackageVersion\>..."*
+- Versions must be valid SemVer (`MAJOR.MINOR.PATCH`)
+- Docs-only changes (`*.md`) skip CI entirely
