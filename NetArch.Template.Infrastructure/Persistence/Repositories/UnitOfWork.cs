@@ -12,7 +12,6 @@ namespace NetArch.Template.Infrastructure.Persistence.Repositories;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _context;
-    private bool _disposed;
 
     public UnitOfWork(AppDbContext context)
     {
@@ -21,18 +20,5 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task<int> SaveAsync(CancellationToken cancellationToken = default)
         => await _context.SaveChangesAsync(cancellationToken);
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed && disposing)
-            _context.Dispose();
-        _disposed = true;
-    }
 }
 #endif

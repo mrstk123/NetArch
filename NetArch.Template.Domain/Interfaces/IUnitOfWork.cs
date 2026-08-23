@@ -1,11 +1,8 @@
 #if (IsEFCore)
-using System;
-
 namespace NetArch.Template.Domain.Interfaces;
 
-public interface IUnitOfWork: IDisposable
+public interface IUnitOfWork
 {
-
     Task<int> SaveAsync(CancellationToken cancellationToken = default);
 }
 #endif

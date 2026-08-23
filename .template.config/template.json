@@ -88,10 +88,6 @@
         "IsAngular": {
             "type": "computed",
             "value": "(ui == \"Angular\" || ui == \"angular\")"
-        },
-        "IsSourceCompile": {
-            "type": "computed",
-            "value": "false"
         }
     },
     "sources": [
@@ -101,9 +97,14 @@
                 "**/.idea/**",
                 ".vscode/*",
                 ".template.config/**",
-                ".gitignore",
+                ".github/workflows/auto-release.yml",
+                "TestNetArch/**",
                 "README.md",
-                "NetArch.Template.csproj"
+                "NetArch.Template.csproj",
+                "**/bin/**",
+                "**/obj/**",
+                "**/node_modules/**",
+                "**/.angular/**"
             ],
             "modifiers": [
                 {
@@ -126,31 +127,38 @@
                     ]
                 },
                 {
-                    "condition": "(orm == 'Dapper' || orm == 'dapper')",
-                    "exclude": [
-                        "NetArch.Template.Infrastructure/Persistence/Configurations/**",
-                        "NetArch.Template.Infrastructure/Persistence/Context/**"
-                    ]
-                },
-                {
                     "condition": "(orm != 'EFCore' && orm != 'efcore')",
                     "exclude": [
                         "NetArch.Template.Domain/Interfaces/IGenericRepository.cs",
                         "NetArch.Template.Domain/Interfaces/IUnitOfWork.cs",
                         "NetArch.Template.BusinessLogic/Interfaces/IGenericRepository.cs",
                         "NetArch.Template.BusinessLogic/Interfaces/IUnitOfWork.cs",
-                        "NetArch.Template.Infrastructure/Persistence/Interceptors/**",
                         "NetArch.Template.Infrastructure/Persistence/Repositories/**"
+                    ]
+                },
+                {
+                    "condition": "(orm == 'Dapper' || orm == 'dapper')",
+                    "exclude": [
+                        "NetArch.Template.Infrastructure/Persistence/Interceptors/**",
+                        "NetArch.Template.Infrastructure/Persistence/Configurations/*.cs",
+                        "NetArch.Template.Infrastructure/Persistence/Context/*.cs",
+                        "NetArch.Template.Infrastructure/Services/*.cs"
                     ]
                 },
                 {
                     "condition": "(orm == 'EFCore' || orm == 'efcore')",
                     "exclude": [
-                        "NetArch.Template.Application/Interfaces/Commands/**",
-                        "NetArch.Template.Application/Interfaces/Queries/**",
-                        "NetArch.Template.Infrastructure/Commands/**",
-                        "NetArch.Template.Infrastructure/Queries/**",
-                        "NetArch.Template.Infrastructure/Persistence/Scripts/**"
+                        "NetArch.Template.Application/Interfaces/Commands/*.cs",
+                        "NetArch.Template.Application/Interfaces/Queries/*.cs",
+                        "NetArch.Template.Application/DTOs/CreateProductRequest.cs",
+                        "NetArch.Template.Application/DTOs/ProductSummaryDto.cs",
+                        "NetArch.Template.BusinessLogic/Interfaces/Commands/*.cs",
+                        "NetArch.Template.BusinessLogic/Interfaces/Queries/*.cs",
+                        "NetArch.Template.BusinessLogic/DTOs/*.cs",
+                        "NetArch.Template.Infrastructure/Commands/*.cs",
+                        "NetArch.Template.Infrastructure/Queries/*.cs",
+                        "NetArch.Template.Infrastructure/Persistence/Scripts/001_CreateProducts.sql",
+                        "NetArch.Template.WebAPI/Controllers/ProductsController.cs"
                     ]
                 }
             ]

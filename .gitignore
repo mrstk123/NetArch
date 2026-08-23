@@ -7,6 +7,9 @@
 # Test results
 [Tt]est[Rr]esults/
 
+# Local template test sandbox (scaffolded projects)
+TestNetArch/
+
 # IDE & Editor exclusions
 .idea/
 .vscode/*

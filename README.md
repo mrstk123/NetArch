@@ -83,6 +83,50 @@ If you want to create a Clean Architecture application, utilizing EF Core for al
 dotnet new net-arch -n MyApp -o ./MyApp --architecture clean --orm efcore --ui angular
 ```
 
+## What's Included
+
+Every generated project ships with:
+
+- **OpenAPI + Scalar UI** — interactive API docs at `/scalar/v2` (development only)
+- **Health checks** — liveness endpoint at `/health` (`--orm EFCore|Hybrid` adds a database check)
+- **Global exception handling** — unhandled errors return RFC 7807 `ProblemDetails`
+- **Audit fields** — `CreatedAt` / `CreatedBy` / `UpdatedAt` / `UpdatedBy` populated automatically on EF Core writes (`EFCore` and `Hybrid`)
+- **Soft delete** — `IsActive` defaults to `true`; repository `Delete` sets `IsActive = false`, and EF Core queries automatically filter out inactive rows
+- **Test project** — an xUnit test project with passing sample tests
+- **Docker** — `Dockerfile` and `docker-compose.yml` (API + SQL Server 2022): `docker compose up --build`
+
+### Sample Code by ORM Choice
+
+- **`EFCore`**: `Product` entity + `ProductConfiguration`, generic repository, unit of work, audit interceptor, soft-delete query filters
+- **`Dapper`**: end-to-end `Products` sample (query/command handlers, controller, SQL table script in `Persistence/Scripts`)
+- **`Hybrid`**: both of the above against the same `Products` table
+
+---
+
+## Database Migrations (EFCore / Hybrid)
+
+The generated solution is configured to keep EF Core migrations in the Infrastructure project. Create the initial migration with:
+
+```bash
+dotnet ef migrations add Initial \
+  --project NetArch.Template.Infrastructure \
+  --startup-project NetArch.Template.WebAPI
+```
+
+> Requires the `dotnet-ef` tool: `dotnet tool install --global dotnet-ef`
+
+---
+
+## Testing
+
+The generated solution includes a `<YourProject>.Tests` project:
+
+```bash
+dotnet test <YourSolution>.sln
+```
+
+---
+
 ## Uninstalling the Template
 
 If you installed from source (Option 2), run:

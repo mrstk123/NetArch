@@ -7,15 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="16.1.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
-
-  <!--#if (IsDapper || IsHybrid)-->
-  <ItemGroup>
-    <Folder Include="Interfaces/Commands/" />
-    <Folder Include="Interfaces/Queries/" />
-  </ItemGroup>
-<!--#endif-->
 
 </Project>

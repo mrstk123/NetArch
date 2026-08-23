@@ -21,7 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="**\*" Exclude="**\bin\**;**\obj\**;**\.git\**;**\.vs\**;**\.idea\**;**\.vscode\**;**\node_modules\**;**\.angular\**;**\dist\**;**\TestResults\**;NetArch.Template.csproj;*.user;*.suo" />
+    <Content Include="**\*" Exclude="**\bin\**;**\obj\**;**\.git\**;**\.vs\**;**\.idea\**;**\.vscode\**;**\node_modules\**;**\.angular\**;**\dist\**;**\TestResults\**;TestNetArch\**;**\.DS_Store;NetArch.Template.csproj;*.user;*.suo" />
     <Compile Remove="**\*" />
   </ItemGroup>
 

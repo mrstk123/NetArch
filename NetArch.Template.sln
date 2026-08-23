@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetArch.Template.Infrastruc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetArch.Template.WebAPI", "NetArch.Template.WebAPI\NetArch.Template.WebAPI.csproj", "{60B2FA4A-C8BF-4908-A3BA-47E7D0D8318E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetArch.Template.Tests", "NetArch.Template.Tests\NetArch.Template.Tests.csproj", "{2DF9445D-85FB-4C23-93BD-04142A220825}"
+EndProject
 #if (IsNTier)
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetArch.Template.BusinessLogic", "NetArch.Template.BusinessLogic\NetArch.Template.BusinessLogic.csproj", "{3C1609E2-CD5E-4FEB-8785-228A8F281F58}"
 EndProject
@@ -77,6 +79,18 @@ Global
 		{60B2FA4A-C8BF-4908-A3BA-47E7D0D8318E}.Release|x64.Build.0 = Release|Any CPU
 		{60B2FA4A-C8BF-4908-A3BA-47E7D0D8318E}.Release|x86.ActiveCfg = Release|Any CPU
 		{60B2FA4A-C8BF-4908-A3BA-47E7D0D8318E}.Release|x86.Build.0 = Release|Any CPU
+		{2DF9445D-85FB-4C23-93BD-04142A220825}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DF9445D-85FB-4C23-93BD-04142A220825}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DF9445D-85FB-4C23-93BD-04142A220825}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2DF9445D-85FB-4C23-93BD-04142A220825}.Debug|x64.Build.0 = Debug|Any CPU
+		{2DF9445D-85FB-4C23-93BD-04142A220825}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2DF9445D-85FB-4C23-93BD-04142A220825}.Debug|x86.Build.0 = Debug|Any CPU
+		{2DF9445D-85FB-4C23-93BD-04142A220825}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DF9445D-85FB-4C23-93BD-04142A220825}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DF9445D-85FB-4C23-93BD-04142A220825}.Release|x64.ActiveCfg = Release|Any CPU
+		{2DF9445D-85FB-4C23-93BD-04142A220825}.Release|x64.Build.0 = Release|Any CPU
+		{2DF9445D-85FB-4C23-93BD-04142A220825}.Release|x86.ActiveCfg = Release|Any CPU
+		{2DF9445D-85FB-4C23-93BD-04142A220825}.Release|x86.Build.0 = Release|Any CPU
 #if (IsNTier)
 		{3C1609E2-CD5E-4FEB-8785-228A8F281F58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3C1609E2-CD5E-4FEB-8785-228A8F281F58}.Debug|Any CPU.Build.0 = Debug|Any CPU

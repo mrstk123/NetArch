@@ -1,40 +1,42 @@
 #if (IsEFCore || IsHybrid)
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-#if (IsClean && IsEFCore)
-using NetArch.Template.Infrastructure.Persistence.Interceptors;
+#if (IsClean)
+using NetArch.Template.Domain.Entities;
+#endif
+#if (IsNTier)
+using NetArch.Template.BusinessLogic.Entities;
 #endif
 
 namespace NetArch.Template.Infrastructure.Persistence.Context;
 
 public class AppDbContext : DbContext
 {
-#if (IsClean && IsEFCore)
-    private readonly AuditableEntityInterceptor _auditableInterceptor;
-#endif
-
-    public AppDbContext(
-        DbContextOptions<AppDbContext> options
-#if (IsClean && IsEFCore)
-        , AuditableEntityInterceptor auditableInterceptor
-#endif
-    ) : base(options)
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
-#if (IsClean && IsEFCore)
-        _auditableInterceptor = auditableInterceptor;
-#endif
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        ApplySoftDeleteQueryFilters(modelBuilder);
         base.OnModelCreating(modelBuilder);
     }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    private static void ApplySoftDeleteQueryFilters(ModelBuilder modelBuilder)
     {
-#if (IsClean && IsEFCore)
-        optionsBuilder.AddInterceptors(_auditableInterceptor);
-#endif
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (!typeof(BaseEntity).IsAssignableFrom(entityType.ClrType)) continue;
+
+            var parameter = Expression.Parameter(entityType.ClrType);
+            var isActive = Expression.Equal(
+                Expression.Property(parameter, nameof(BaseEntity.IsActive)),
+                Expression.Constant(true));
+            var filter = Expression.Lambda(isActive, parameter);
+
+            modelBuilder.Entity(entityType.ClrType).HasQueryFilter(filter);
+        }
     }
 }
 #endif

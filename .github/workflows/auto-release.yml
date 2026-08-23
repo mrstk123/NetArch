@@ -1,12 +1,67 @@
-name: Auto Release NuGet on Main Push
+name: Validate Template and Release NuGet on Main Push
 
 on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
 
 jobs:
-  build-and-release:
+  # Generate and build every architecture x ORM variant so conditional
+  # template code paths are actually compiled before a release ships.
+  validate-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture: [Clean, NTier]
+        orm: [EFCore, Dapper, Hybrid]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install template from source
+        run: dotnet new install $GITHUB_WORKSPACE
+
+      - name: Scaffold project (${{ matrix.architecture }} / ${{ matrix.orm }})
+        run: dotnet new net-arch -n MatrixApp -o "$RUNNER_TEMP/matrix" --architecture ${{ matrix.architecture }} --orm ${{ matrix.orm }}
+
+      - name: Build scaffolded solution
+        run: dotnet build "$RUNNER_TEMP/matrix/MatrixApp.sln" -c Release
+
+      - name: Run scaffolded tests
+        run: dotnet test "$RUNNER_TEMP/matrix/MatrixApp.sln" -c Release --no-build
+
+  validate-angular:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install template from source
+        run: dotnet new install $GITHUB_WORKSPACE
+
+      - name: Scaffold Angular project
+        run: dotnet new net-arch -n AngularApp -o "$RUNNER_TEMP/angular" --ui angular
+
+      # Release build skips npm targets (DebugEnsureNodeEnv is Debug-only),
+      # this validates the WebAPI project compiles with SPA wiring enabled.
+      - name: Build scaffolded solution
+        run: dotnet build "$RUNNER_TEMP/angular/AngularApp.sln" -c Release
+
+  release:
+    needs: [validate-matrix, validate-angular]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -15,13 +70,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 1. Set up the .NET SDK
-      - name: Setup .NET Core
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x' 
+          dotnet-version: '10.0.x'
 
-      # 2. Generate both a Tag Name and a strict NuGet Version
+      # Generate both a Tag Name and a strict NuGet Version
       - name: Generate Version Numbers
         id: version_generator
         run: |
@@ -29,12 +83,13 @@ jobs:
           echo "NUGET_VERSION=$DATE_VERSION" >> $GITHUB_ENV
           echo "TAG_NAME=v$DATE_VERSION" >> $GITHUB_ENV
 
-      # 3. Build and Pack the .NET project into a .nupkg file
+      # Pack ONLY the template csproj — a bare `dotnet pack` would resolve to the
+      # solution and publish every layer project as an unwanted NuGet package.
       # /p:Version overrides the version inside your .csproj file with our new date version
       - name: Pack NuGet Package
-        run: dotnet pack --configuration Release /p:Version=${{ env.NUGET_VERSION }} --output ./nupkg-artifacts
+        run: dotnet pack NetArch.Template.csproj --configuration Release /p:Version=${{ env.NUGET_VERSION }} --output ./nupkg-artifacts
 
-      # 4. Create the Release AND upload the generated .nupkg file to it
+      # Create the Release AND upload the generated .nupkg file to it
       - name: Create GitHub Release & Upload Asset
         uses: softprops/action-gh-release@v2
         with:

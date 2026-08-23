@@ -1,6 +1,23 @@
 @NetArch.Template.WebAPI_HostAddress = http://localhost:5003
 
-GET {{NetArch.Template.WebAPI_HostAddress}}/weatherforecast/
+GET {{NetArch.Template.WebAPI_HostAddress}}/health
 Accept: application/json
+
+###
+
+# Scalar API reference (development only): http://localhost:5003/scalar
+#
+# The sample endpoints below require --orm Dapper or Hybrid.
+GET {{NetArch.Template.WebAPI_HostAddress}}/api/products
+Accept: application/json
+
+###
+
+POST {{NetArch.Template.WebAPI_HostAddress}}/api/products
+Content-Type: application/json
+
+{
+  "name": "Sample product"
+}
 
 ###

@@ -18,48 +18,37 @@
   </ItemGroup>
 <!--#endif-->
 
+<!--#if (IsDapper)-->
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.5" />
-  </ItemGroup>
-
-<!--#if (IsSourceCompile)-->
-  <!--
-    Source project compilation: these are included ONLY when building the template source project
-    itself, so that the IDE compiler has types to resolve and #if blocks to evaluate.
-    When the template is generated, template.json will exclude these elements.
-  -->
-  <PropertyGroup>
-    <DefineConstants>$(DefineConstants);IsEFCore;IsClean</DefineConstants>
-    <NoWarn>$(NoWarn);NU1504</NoWarn>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Dapper" Version="2.1.35" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
+    <!-- Not transitive via Dapper/SqlClient; EF Core supplies these in EFCore/Hybrid modes -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" />
   </ItemGroup>
 <!--#endif-->
 
 <!--#if (IsEFCore || IsHybrid)-->
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
   </ItemGroup>
 <!--#endif-->
 
 <!--#if (IsDapper || IsHybrid)-->
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.35" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+  </ItemGroup>
+<!--#endif-->
+
+<!--#if (IsEFCore || IsHybrid)-->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 <!--#endif-->
 
@@ -67,12 +56,12 @@
   <ItemGroup>
     <Folder Include="Persistence/Configurations/" />
     <Folder Include="Persistence/Context/" />
+    <Folder Include="Persistence/Interceptors/" />
   </ItemGroup>
 <!--#endif-->
 
 <!--#if (IsEFCore)-->
   <ItemGroup>
-    <Folder Include="Persistence/Interceptors/" />
     <Folder Include="Persistence/Repositories/" />
   </ItemGroup>
 <!--#endif-->

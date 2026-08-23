@@ -6,20 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-<!--#if (IsSourceCompile)-->
-  <PropertyGroup>
-    <DefineConstants>$(DefineConstants);IsEFCore;IsClean</DefineConstants>
-  </PropertyGroup>
-<!--#endif-->
-
   <ItemGroup>
-    <Folder Include="DTOs/" />
-    <Folder Include="Interfaces/" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="16.1.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
 
 </Project>

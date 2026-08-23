@@ -1,0 +1,36 @@
+name: Build and Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # This workflow ships inside generated projects. When it lands back on the
+      # template repository itself (.template.config present) there is no
+      # buildable solution, so the job exits cleanly instead of failing.
+      - name: Detect generated project
+        id: guard
+        run: |
+          if [ ! -d .template.config ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup .NET
+        if: steps.guard.outputs.run == 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build
+        if: steps.guard.outputs.run == 'true'
+        run: dotnet build "$(ls *.sln | head -1)" -c Release
+
+      - name: Test
+        if: steps.guard.outputs.run == 'true'
+        run: dotnet test "$(ls *.sln | head -1)" -c Release --no-build

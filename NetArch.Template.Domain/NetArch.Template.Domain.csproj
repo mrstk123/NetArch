@@ -6,17 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-<!--#if (IsSourceCompile)-->
-  <PropertyGroup>
-    <DefineConstants>$(DefineConstants);IsEFCore;IsClean</DefineConstants>
-  </PropertyGroup>
-<!--#endif-->
-
-  <!--#if (IsEFCore)-->
-  <ItemGroup>
-    <Folder Include="Interfaces/IGenericRepository" />
-    <Folder Include="Interfaces/IUnitOfWork" />
-  </ItemGroup>
-<!--#endif-->
-
 </Project>

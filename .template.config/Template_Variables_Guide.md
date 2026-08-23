@@ -21,22 +21,19 @@ When a user runs `dotnet new net-arch --architecture ntier`, the template engine
 ---
 
 ## 2. The IDE & MSBuild (Authoring the Template)
-When you open `NetArch.Template.sln` to actively develop the template, your IDE’s compiler (Roslyn) analyzes the raw source code. It has no idea that `template.json` exists.
+When you open `NetArch.Template.sln` to actively develop the template, your IDE's compiler (Roslyn) analyzes the raw source code. It has no idea that `template.json` exists.
 
 ### How it behaves:
 - It processes standard C# `#if (IsNTier)` blocks natively.
-- **The Problem:** If the IDE doesn't know what `IsClean` or `IsEFCore` means, it treats them as `false` by default. This grays out your code, disables your interface `using` statements, and creates dozens of "Missing Namespace" compiler errors.
-- **The Solution:** We manually inject `<DefineConstants>` into the `.csproj` files:
-  ```xml
-  <PropertyGroup Condition="'$(IsTemplateGenerated)' == ''">
-    <!-- This forcefully turns ON the code paths we want the IDE to compile for us -->
-    <DefineConstants>$(DefineConstants);IsEFCore;IsClean</DefineConstants>
-  </PropertyGroup>
-  ```
+- **The Problem:** Since no `DefineConstants` are ever defined while authoring, every template symbol evaluates to `false`. This grays out your conditional code, disables `using` statements, and hides IntelliSense for code paths that only appear in some variants.
+- **The Reality:** Conditional code is *never* compiled while authoring the template. It is only compiled after a user scaffolds a project and builds it.
 
-### The `IsTemplateGenerated` Sandbox Strategy
-To ensure that those `<DefineConstants>` (which help our IDE) do not accidentally end up permanently injected into our user's scaffolded application, we use the `IsTemplateGenerated` trigger string:
-
-1. **In the `.csproj`**: The code is wrapped inside `<PropertyGroup Condition="'$(IsTemplateGenerated)' == ''">`. Because no such variable exists while you author the template, it evaluates to `true`, and the IDE turns on the constants.
-2. **In `template.json`**: We configure `#StripSourceCompilation` to aggressively search the entire codebase for the literal string `Condition="'$(IsTemplateGenerated)' == ''"` and text-replace it with `Condition="false"`.
-3. **In the Generated User App**: The user's freshly generated `.csproj` now reads `<PropertyGroup Condition="false">`. MSBuild sees `false` and completely skips over the `<DefineConstants>`, executing a perfectly clean project generation hook!
+### What this means in practice:
+1. **Keep every conditional block self-contained.** A `#if` block must compile on its own: its `using` directives, base types, and referenced symbols must all be guarded by the same (or broader) conditions. An unguarded `using` pointing at a file excluded by `template.json` will break that variant's build.
+2. **Validate by scaffolding, not by building the source solution.** Building `NetArch.Template.sln` proves almost nothing because most conditionals compile to empty files. The real gate is generating and building each variant:
+   ```bash
+   dotnet new net-arch -n TestApp -o /tmp/test --architecture Clean --orm Dapper
+   dotnet build /tmp/test/TestApp.sln
+   ```
+   Run this matrix over `architecture × orm` (`Clean/NTier × EFCore/Dapper/Hybrid`) whenever you touch conditional code.
+3. **Watch out for name collisions in generated namespaces.** The user's project name becomes the root namespace. Code like `EF.Property<T>(...)` breaks if a project is named e.g. `Contoso.EF`, because the namespace segment `EF` shadows the `Microsoft.EntityFrameworkCore.EF` class. Prefer strongly-typed expressions over `EF.Property`, or fully qualify such helpers.
